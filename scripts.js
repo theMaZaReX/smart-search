@@ -1,4 +1,5 @@
 const $search = $('#search');
+$('.btn').attr('disabled', true);
 
 
 const outputSearchResults = function(data){
@@ -7,11 +8,14 @@ const outputSearchResults = function(data){
     clearSearchResults();
 
     resultJson.forEach(function (element) {
-        $search.append(`<div class="search-results__item">${element.name}<span class="search-results__item-price">Цена: ${element.price} руб.</span><span class="search-results__item-count">Кол-во: ${element.number} шт.</span></div>`)
+        $search.append(`
+    <div class="search-results__item">${element.name}
+        <span class="search-results__item-price">Цена: ${element.price} руб.</span>
+        <span class="search-results__item-count">Кол-во: ${element.number} шт.</span>
+    </div>`)
  })
 
     setHighlightText();
-
 
 }
 
@@ -38,7 +42,17 @@ const clearSearchResults = function (){
 $('#input-search').keyup(function () {
 
     const $searchStr = $(this).val();
-    if ($searchStr.length != 0) {
+
+
+        if ($searchStr.length != 0) {
+
+          if($searchStr.length>=3){
+              $('.btn').attr('disabled', false);
+          }
+          else{
+              $('.btn').attr('disabled', true);
+          }
+
         $.ajax({
             url: '/search.php',
             type: 'POST',
@@ -54,3 +68,12 @@ $('#input-search').keyup(function () {
     }
 
 })
+
+$('.btn').click(function () {
+    $.ajax({
+        url: '/search.php',
+        type: 'POST',
+        data: {'click': true}
+    })
+})
+
