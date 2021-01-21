@@ -27,6 +27,37 @@ class Search
 
     }
 
+    private function deleteLogsInTxt()
+    {
+        $this->logFile = fopen('logs.txt', 'w+');
+        fclose($this->logFile);
+    }
+
+    private function writeLogsInDB()
+    {
+        $strLogs = file('logs.txt');
+        $prevTextSearchReques = '';
+        for ($i = 0; $i < count($strLogs); $i++) {
+            $str = trim($strLogs[$i]);
+            $textData = explode("Дата: ", explode("Поисковый запрос", $str)[0])[1];
+            $date = new DateTime($textData);
+            $date = $date->format('Y-m-d H:i:s');
+            $textSearchRequest = trim(explode("Поисковый запрос: ", explode("Кол-во найденных товаров", $str)[0])[1]);
+            if ($prevTextSearchReques==$textSearchRequest){
+                continue;
+            }
+            $textNumber = mb_substr($str, mb_strrpos($str, 'Кол-во найденных товаров: ') + mb_strlen('Кол-во найденных товаров: '));
+            $number = (int)$textNumber;
+            $sql = "INSERT INTO logs (date, request, number) VALUES (?,?,?)";
+            $stmt = $this->mysqli->prepare($sql);
+            $stmt->bind_param('ssi', $date, $textSearchRequest, $number);
+            $stmt->execute();
+
+            $prevTextSearchReques = $textSearchRequest;
+        }
+        $this->deleteLogsInTxt();
+
+    }
 
     public function getResult()
     {
@@ -45,7 +76,15 @@ class Search
             }
         }
 
+            if (in_array($_POST['click'], $_POST)) {
+                if (!file_get_contents('logs.txt'))
+                    echo "Заказов нет!";
+                else{
+                    $this->writeLogsInDB();
+                    return "Логи записаны в БД";
+                }
 
+            }
             return $jsonData;
 
 
