@@ -9,7 +9,7 @@ class Search
 
     public function __construct($host, $user, $pass, $db)
     {
-        if (isset($_POST['searchRequest'])){
+        if (isset($_POST['searchRequest'])) {
             $this->searchRequest = $_POST['searchRequest'];
         }
         $this->mysqli = new mysqli($host, $user, $pass, $db);
@@ -37,13 +37,14 @@ class Search
     {
         $strLogs = file('logs.txt');
         $prevTextSearchReques = '';
+        $prevDate=null;
         for ($i = 0; $i < count($strLogs); $i++) {
             $str = trim($strLogs[$i]);
             $textData = explode("Дата: ", explode("Поисковый запрос", $str)[0])[1];
             $date = new DateTime($textData);
             $date = $date->format('Y-m-d H:i:s');
             $textSearchRequest = trim(explode("Поисковый запрос: ", explode("Кол-во найденных товаров", $str)[0])[1]);
-            if ($prevTextSearchReques==$textSearchRequest){
+            if ($prevTextSearchReques == $textSearchRequest && $prevDate==$date) {
                 continue;
             }
             $textNumber = mb_substr($str, mb_strrpos($str, 'Кол-во найденных товаров: ') + mb_strlen('Кол-во найденных товаров: '));
@@ -54,7 +55,9 @@ class Search
             $stmt->execute();
 
             $prevTextSearchReques = $textSearchRequest;
+            $prevDate = $date;
         }
+
         $this->deleteLogsInTxt();
 
     }
@@ -67,27 +70,32 @@ class Search
             while ($row = $result->fetch_assoc()) {
                 $resultArr[] = $row;
             }
-            $jsonData = json_encode($resultArr, JSON_UNESCAPED_UNICODE);
+            if (count($resultArr) != 0){
 
+                $jsonResults = json_encode($resultArr, JSON_UNESCAPED_UNICODE);
 
-            if(count($resultArr) != 0 && mb_strlen($this->searchRequest, 'utf-8') >= 3){
-                $this->writeLogsInTxt($resultArr);
-
+                if (mb_strlen($this->searchRequest, 'utf-8') >= 3){
+                    $this->writeLogsInTxt($resultArr);
+                    $logsArr = file('logs.txt');
+                    $jsonLogs = json_encode($logsArr, JSON_UNESCAPED_UNICODE);
+                }
+                $jsonData = $jsonResults.'//'.$jsonLogs;
             }
+
+
+           return $jsonData;
         }
 
-            if (in_array($_POST['click'], $_POST)) {
-                if (!file_get_contents('logs.txt'))
-                    echo "Заказов нет!";
-                else{
-                    $this->writeLogsInDB();
-                    return "Логи записаны в БД";
-                }
+        if (in_array($_POST['click'], $_POST)) {
+            if (!file_get_contents('logs.txt'))
+                echo "Заказов нет!";
+            else {
 
+                $this->writeLogsInDB();
+                return "Логи записаны в БД";
             }
-            return $jsonData;
 
-
+        }
 
 
     }

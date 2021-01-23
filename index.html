@@ -9,15 +9,36 @@
 <body>
 
 <div class="main">
-    <h1>Smart search</h1>
-    <input class = 'input-search' id="input-search" type="search">
-    <div id="search">
 
+    <h1 class="title">Smart search (JS, PHP, MySQL)</h1>
+    <div class="main__inner">
+        <div class="description">
+            <ol>
+                <li>Результаты поиска выводятся при вводе хотя бы одной буквы</li>
+                <li>Запросы, где содержиться больше 3-символов записываются в logs.txt</li>
+            </ol>
+        </div>
+        <div class="search">
+            <input id='search__checkbox' type="checkbox">
+            <label for="search__checkbox">
+                <i class="fa fa-2x fa-search btn-search"></i>
+                <i class="fa fa-2x fa-times btn-close"></i>
+            </label>
+            <input class='search__input' id="input-search" type="text" placeholder="Поиск...">
+            <div id="search-results" class="search-results">
+
+            </div>
+            <button class="btn-insertBD">Записать логи в БД</button>
+        </div>
+        <ul class="logs">
+
+        </ul>
     </div>
 
-    <button class="btn">Записать логи в БД</button>
 </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://use.fontawesome.com/d154269da4.js" defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
 <script src="/scripts.js" defer></script>
+
 </body>
 </html>

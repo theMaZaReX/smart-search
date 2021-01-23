@@ -1,27 +1,51 @@
-const $search = $('#search');
-$('.btn').attr('disabled', true);
+const $searchResults = $('#search-results');
+const $logs = $('.logs');
+let $searchStr = $('#input-search').val();
+$('.btn-insertBD').attr('disabled', true);
 
 
-const outputSearchResults = function(data){
-    const resultJson = JSON.parse(data);
 
-    clearSearchResults();
+const outputSearchResults = function (data,cb) {
+    const dataArr = data.split('//');
+    const result = dataArr[0];
+    const txtLogs = dataArr[1];
+    if (data.length===0){
+        cb($searchResults);
+        return false;
+    }
+
+    if ($searchStr.length===0){
+       return cb();
+    }
+
+   //const resultJson = JSON.parse(data);
+    const resultJson = JSON.parse(result);
+    const txtFileJson = JSON.parse(txtLogs);
+    cb($searchResults);
 
     resultJson.forEach(function (element) {
-        $search.append(`
-    <div class="search-results__item">${element.name}
-        <span class="search-results__item-price">Цена: ${element.price} руб.</span>
-        <span class="search-results__item-count">Кол-во: ${element.number} шт.</span>
+        $searchResults.append(`
+    <div class="search-results__item">
+        <span class = "search-results__item-name">${element.name}:</span>
+        <span class="search-results__item-price">${element.price} руб.,</span>
+        <span class="search-results__item-count">кол-во: ${element.number} шт.</span>
     </div>`)
- })
+    })
 
     setHighlightText();
-
+    outputContentFromTxt(txtFileJson);
 }
 
-const setHighlightText = function(){
-    const $searchStr = $('#input-search').val();
-    if ($search.length != 0) {
+const outputContentFromTxt = function (data) {
+    clearResults($logs);
+    data.forEach(function (element) {
+        $logs.append(`<li>${element}</li>`)
+    })
+}
+
+const setHighlightText = function () {
+    $searchStr = $('#input-search').val();
+    if ($searchResults.length != 0) {
         $('.search-results__item').each(function (i, resultItem) {
             let index = resultItem.textContent.toLowerCase().indexOf($searchStr);
             let lastIndex = index + $searchStr.length;
@@ -31,49 +55,57 @@ const setHighlightText = function(){
     }
 }
 
-const clearSearchResults = function (){
-    $search.each(function (i, item) {
-        while (item.firstChild) {
-            item.removeChild(item.firstChild);
-        }
-    })
+const clearResults = function (element) {
+
+    element.each(function (i, item) {
+            while (item.firstChild) {
+                item.removeChild(item.firstChild);
+            }
+        })
+
 }
 
 $('#input-search').keyup(function () {
 
-    const $searchStr = $(this).val();
+    $searchStr = $(this).val();
 
 
-        if ($searchStr.length != 0) {
-
-          if($searchStr.length>=3){
-              $('.btn').attr('disabled', false);
-          }
-          else{
-              $('.btn').attr('disabled', true);
-          }
-
+    if ($searchStr.length != 0) {
+/*
+        if ($searchStr.length >= 3) {
+            $('.btn-insertBD').attr('disabled', false);
+        } else {
+            $('.btn-insertBD').attr('disabled', true);
+        }
+*/
         $.ajax({
             url: '/search.php',
             type: 'POST',
             data: {'searchRequest': $searchStr},
             dataType: 'html',
             success: function (data) {
-                outputSearchResults(data, $searchStr);
+                outputSearchResults(data, clearResults);
+
             }
+
         })
     }
-    else{
-        clearSearchResults();
-    }
+        else{
+           return clearResults($searchResults);
+        }
+
 
 })
 
-$('.btn').click(function () {
+$('.btn-insertBD').click(function () {
     $.ajax({
         url: '/search.php',
         type: 'POST',
-        data: {'click': true}
+        data: {'click': true},
+        success: function (data) {
+        alert('Логи загружены из txt файла в БД');
+            $('.btn-insertBD').attr('disabled', true);
+        }
     })
 })
 
