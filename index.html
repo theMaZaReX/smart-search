@@ -13,10 +13,14 @@
     <h1 class="title">Smart search (JS, PHP, MySQL)</h1>
     <div class="main__inner">
         <div class="description">
-            <ol>
+            <h2 class="description__title">Описание</h2>
+            <ol class="description__list">
                 <li>Результаты поиска выводятся при вводе хотя бы одной буквы</li>
-                <li>Запросы, где содержиться больше 3-символов записываются в logs.txt</li>
+                <li>В результаты поиска попадают товары у которых количество больше 0</li>
+                <li>Запросы, где содержиться больше 3-символов и по которым есть совпадения с товарами в БД в таблице goods записываются в logs.txt</li>
+                <li>Если txt файл не пустой, по нажатию на кнопку "Записать логи в БД" записи из logs.txt будут добавлены в БД в таблицу logs</li>
             </ol>
+
         </div>
         <div class="search">
             <input id='search__checkbox' type="checkbox">
@@ -30,9 +34,11 @@
             </div>
             <button class="btn-insertBD">Записать логи в БД</button>
         </div>
-        <ul class="logs">
-
-        </ul>
+        <div class="logs">
+            <h2 class="logs__title">Содержимое txt файла</h2>
+           <ul class="logs__list">
+            </ul>
+        </div>
     </div>
 
 </div>

@@ -1,5 +1,5 @@
 const $searchResults = $('#search-results');
-const $logs = $('.logs');
+const $logs = $('.logs__list');
 let $searchStr = $('#input-search').val();
 
 
@@ -62,6 +62,7 @@ const clearResults = function (element) {
         })
 
 }
+
 
 $('#input-search').keyup(function () {
 
