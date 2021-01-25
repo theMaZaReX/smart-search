@@ -87,17 +87,15 @@ class Search
         }
 
         if (in_array($_POST['click'], $_POST)) {
-            if (!file_get_contents('logs.txt'))
-                echo "Заказов нет!";
-            else {
-
+            if (file_get_contents('logs.txt')) {
                 $this->writeLogsInDB();
-                return "Логи записаны в БД";
+                return 'Логи загружены из txt файла в БД';
+            }
+            else{
+                return '';
             }
 
         }
-
-
     }
 }
 

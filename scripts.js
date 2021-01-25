@@ -1,8 +1,6 @@
 const $searchResults = $('#search-results');
 const $logs = $('.logs');
 let $searchStr = $('#input-search').val();
-$('.btn-insertBD').attr('disabled', true);
-
 
 
 const outputSearchResults = function (data,cb) {
@@ -18,7 +16,7 @@ const outputSearchResults = function (data,cb) {
        return cb();
     }
 
-   //const resultJson = JSON.parse(data);
+
     const resultJson = JSON.parse(result);
     const txtFileJson = JSON.parse(txtLogs);
     cb($searchResults);
@@ -71,13 +69,7 @@ $('#input-search').keyup(function () {
 
 
     if ($searchStr.length != 0) {
-/*
-        if ($searchStr.length >= 3) {
-            $('.btn-insertBD').attr('disabled', false);
-        } else {
-            $('.btn-insertBD').attr('disabled', true);
-        }
-*/
+
         $.ajax({
             url: '/search.php',
             type: 'POST',
@@ -103,8 +95,15 @@ $('.btn-insertBD').click(function () {
         type: 'POST',
         data: {'click': true},
         success: function (data) {
-        alert('Логи загружены из txt файла в БД');
-            $('.btn-insertBD').attr('disabled', true);
+            if (data===''){
+                alert('txt файл пуст, введите хотя бы один запрос от 3-х символов');
+            }
+            else{
+                     alert(data);
+                     clearResults($logs);
+            }
+
+
         }
     })
 })
