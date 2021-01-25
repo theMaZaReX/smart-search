@@ -1,24 +1,25 @@
 const $searchResults = $('#search-results');
 const $logs = $('.logs__list');
+const $tbodyGoods = $('.description__examples tbody');
 let $searchStr = $('#input-search').val();
 
 
-const outputSearchResults = function (data,cb) {
+const outputSearchResults = function (data, cb) {
     const dataArr = data.split('//');
-    const result = dataArr[0];
+    const goods = dataArr[0];
     const txtLogs = dataArr[1];
-    if (data.length===0){
+    if (data.length === 0) {
         cb($searchResults);
         return false;
     }
 
-    if ($searchStr.length===0){
-       return cb();
+    if ($searchStr.length === 0) {
+        return cb($searchResults);
     }
 
 
-    const resultJson = JSON.parse(result);
-    const txtFileJson = JSON.parse(txtLogs);
+    const resultJson = JSON.parse(goods);
+
     cb($searchResults);
 
     resultJson.forEach(function (element) {
@@ -31,7 +32,12 @@ const outputSearchResults = function (data,cb) {
     })
 
     setHighlightText();
-    outputContentFromTxt(txtFileJson);
+
+    if (txtLogs) {
+        const txtFileJson = JSON.parse(txtLogs);
+        outputContentFromTxt(txtFileJson);
+    }
+
 }
 
 const outputContentFromTxt = function (data) {
@@ -39,6 +45,21 @@ const outputContentFromTxt = function (data) {
     data.forEach(function (element) {
         $logs.append(`<li>${element}</li>`)
     })
+}
+
+const outputAllGoods = function (data) {
+    if (data) {
+        const goodsJson = JSON.parse(data);
+        goodsJson.forEach(function (element) {
+            $tbodyGoods.append(`
+    <tr>
+       <td>${element.id}</td>
+       <td>${element.name}</td>
+       <td>${element.number}</td>
+       <td>${element.price}</td>
+    </tr>`)
+        })
+    }
 }
 
 const setHighlightText = function () {
@@ -56,12 +77,26 @@ const setHighlightText = function () {
 const clearResults = function (element) {
 
     element.each(function (i, item) {
-            while (item.firstChild) {
-                item.removeChild(item.firstChild);
-            }
-        })
+        while (item.firstChild) {
+            item.removeChild(item.firstChild);
+        }
+    })
 
 }
+
+$(document).ready(function () {
+    $.ajax({
+        url: '/search.php',
+        type: 'POST',
+        data: {'documentReady': true},
+        dataType: 'html',
+        success: function (data) {
+            outputAllGoods(data);
+
+        }
+
+    })
+})
 
 
 $('#input-search').keyup(function () {
@@ -82,10 +117,9 @@ $('#input-search').keyup(function () {
             }
 
         })
+    } else {
+        return clearResults($searchResults);
     }
-        else{
-           return clearResults($searchResults);
-        }
 
 
 })
@@ -96,12 +130,11 @@ $('.btn-insertBD').click(function () {
         type: 'POST',
         data: {'click': true},
         success: function (data) {
-            if (data===''){
+            if (data === '') {
                 alert('txt файл пуст, введите хотя бы один запрос от 3-х символов');
-            }
-            else{
-                     alert(data);
-                     clearResults($logs);
+            } else {
+                alert(data);
+                clearResults($logs);
             }
 
 
@@ -109,3 +142,13 @@ $('.btn-insertBD').click(function () {
     })
 })
 
+$('.btn-close').click(function () {
+    $searchResults.each(function (index, searchResult) {
+        if(searchResult.firstChild){
+            clearResults($searchResults);
+            $searchStr='';
+        }
+    })
+    $('#input-search').val('');
+
+})
