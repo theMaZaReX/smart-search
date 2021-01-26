@@ -103,7 +103,7 @@ class Search
 
 $smartSearch = new Search($host, $user, $pass, $db);
 
-if (in_array($_POST['click'], $_POST)) {
+if (isset($_POST['click'])) {
     if (file_get_contents('logs.txt')) {
         $smartSearch->writeLogsInDB();
         echo 'Логи загружены из txt файла в БД';
@@ -112,7 +112,7 @@ if (in_array($_POST['click'], $_POST)) {
         return;
     }
 }
-else if (in_array($_POST['documentReady'], $_POST)) {
+else if (isset($_POST['documentReady'])) {
     echo $goods = $smartSearch->getResult();
     return;
 }
